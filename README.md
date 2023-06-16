@@ -16,10 +16,26 @@ _/_/_/        _/             _/_/_/      _/_/_/      _/    _/     _/_/_/     _/
 
 By: anjoo91
 GitHub Repo: https://github.com/anjoo91/brick-breaker
+Contact Information: andrew.w.lew@gmail.com
 Game Version: 0.1a
 
 
+File Structure:
+
+    BrickBreaker 
+    ├── assets
+    │   ├── images
+    │   └── sounds
+    ├── css
+    │   └── style.css
+    ├── index.html
+    ├── js
+    │   └── app.js
+    └── README.md
+
+
 About This Game:
+
     A classic brick-breaking game built with HTML, CSS, & Javascript. HTML Canvas is used.
 
     Your goal is to break all the bricks, using the paddle to return the ball towards the bricks each time. 
@@ -32,6 +48,7 @@ About This Game:
 
 
 Features: 
+
     + Paddle control via left & right arrow keys
     + Ball launch via spacebar
     + Current score display
@@ -40,6 +57,7 @@ Features:
 
 
 Work In Progress:
+
     - Remember high scores and display on screen
     - Sound effects for ball bounce, brick break, and other in-game events
     - Different levels & brick configurations
