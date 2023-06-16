@@ -37,12 +37,15 @@ body {
 
 .button-container button {
     flex: 1;
-    margin-right: 75px;
     border-radius: 10px;
     font-weight: bold;
     background-color: black;
     color: violet;
     font-family:'Courier New', Courier, monospace;
+}
+
+#scoresButton {
+    margin-left: 75px;
 }
 
 .audio-controls {
