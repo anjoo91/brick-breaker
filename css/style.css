@@ -1,5 +1,14 @@
 body {
-    background-color: white;
+    background-color: black;
+}
+
+h1 {
+    color: yellow;
+    font-size: 50px;
+    text-align: center;
+}
+
+section {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -7,14 +16,11 @@ body {
     margin: 0;
 }
 
-h1 {
-    text-align: center;
-}
-
 canvas {
-    border: 2px solid #000;
+    border: 2px solid red;
     display: block;
     margin: 20px auto;
+    background-color: gray;
 }
 
 button {
