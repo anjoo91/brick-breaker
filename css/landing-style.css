@@ -44,3 +44,40 @@ body {
     color: violet;
     font-family:'Courier New', Courier, monospace;
 }
+
+.audio-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.audio-controls button{
+    margin-top: 150px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    font-weight: light;
+    background-color: black;
+    color: violet;
+    font-family:'Courier New', Courier, monospace;
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    background: black;
+    height: 6px;
+    border-radius: 3px;
+    outline: none;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: violet;
+    cursor: pointer;
+}
