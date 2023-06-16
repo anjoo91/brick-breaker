@@ -6,7 +6,7 @@ const volumeSlider = document.getElementById("volumeSlider");
 // Function to start the game
 function startGame() {
     // Redirect to the game page
-    window.location.href = "index.html";
+    window.location.href = "game.html";
 }
 
 // Function to view high scores
@@ -15,7 +15,7 @@ function viewScores() {
     window.location.href = "scores.html";
 }
 
-//Function to Play/Pause Music
+//Function to Play/Pause music
 function togglePlayPause() {
     if (audio.paused) {
         audio.play();
