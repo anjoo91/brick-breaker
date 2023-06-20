@@ -1,11 +1,7 @@
 body {
-    background-color: black;
-}
-
-h1 {
-    color: yellow;
-    font-size: 50px;
-    text-align: center;
+    background-image: url('/assets/images/twinkle.gif');
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 section {
@@ -19,8 +15,8 @@ section {
 canvas {
     border: 2px solid red;
     display: block;
-    margin: 20px auto;
-    background-color: gray;
+    margin: 0 auto;
+    background-color: black;
 }
 
 button {
