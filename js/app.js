@@ -329,6 +329,7 @@ function update() {
   drawLives();
 
   requestAnimationFrame(update);
+  console.log(drawBricks);
 }
 
 
@@ -349,9 +350,12 @@ function handleKeyboardInput(event) {
     if (!gameStarted) {
       launchBall();
       gameStarted = true;
+    } else if (gamePaused) {
+      unpauseGame(); // Resume the game
     }
   }
 }
+
 
 // Move the paddle to the left
 function movePaddleLeft() {
@@ -390,6 +394,7 @@ function pauseGame() {
 function unpauseGame() {
   gamePaused = false;
   hidePauseMessage();
+  update();
 }
 
 // Launch the ball -- WIP*
