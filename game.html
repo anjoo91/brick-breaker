@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Brick Breaker</title>
     <link rel="stylesheet" type="text/css" href="css/game-style.css">
 </head>
+
 <body>
+    
     <section>
         <canvas id="gameCanvas"></canvas>
     </section>
@@ -13,11 +16,17 @@
         <p>Game Paused</p>
     </div>
 
-    <div id="gameOverMessage">
-        <p>You Lost</p>
-        <button id="tryAgainBtn">Try Again</button>
+    <div id="victoryMessage" class="message">
+        <h2>You Win!</h2>
+    </div>      
+    
+    <div id="gameOverMessage" style="display: none;">
+        <h2>Game Over</h2>
+        <button id="tryAgainBtn">Try Again?</button>
         <button id="quitBtn">Quit</button>
     </div>
+      
     <script src="js/app.js"></script>
+
 </body>
 </html>

@@ -12,7 +12,7 @@ function startGame() {
 // Function to view high scores
 function viewScores() {
     // Redirect to the scores page
-    window.location.href = "scores.html";
+    window.location.href = "highscores.html";
 }
 
 //Function to Play/Pause music

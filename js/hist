@@ -1,0 +1,420 @@
+/*----- Constants -----*/
+const canvasWidth = 1280;
+const canvasHeight = 720;
+const paddleWidth = 100;
+const paddleHeight = 10;
+const ballRadius = 10;
+const brickWidth = 100;
+const brickHeight = 20;
+const brickPadding = 10;
+const brickOffsetTop = 30;
+let brickOffsetLeft;
+
+/*----- State Variables -----*/
+let paddleX;
+let ballX;
+let ballY;
+let ballSpeedX;
+let ballSpeedY;
+let bricks;
+let brickRowCount;
+let brickColumnCount;
+let score;
+let lives;
+let currentLevel;
+let gamePaused = false;
+let gameLost = false;
+let gameStarted = false; // Track if the game has started
+
+/*----- Cached Elements -----*/
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
+const pauseMessage = document.getElementById("pauseMessage");
+const gameOverMessage = document.getElementById("gameOverMessage");
+const tryAgainBtn = document.getElementById("tryAgainBtn");
+const quitBtn = document.getElementById("quitBtn");
+
+/*----- Event Listeners -----*/
+document.addEventListener("keydown", handleKeyboardInput);
+tryAgainBtn.addEventListener("click", resetAndStartGame);
+quitBtn.addEventListener("click", navigateToScores);
+
+
+/*----- Functions -----*/
+
+// Initialize the game
+function init() {
+  setCanvasDimensions();
+  resetGame();
+  update();
+}
+
+// Set the canvas dimensions
+function setCanvasDimensions() {
+  canvas.width = canvasWidth;
+  canvas.height = canvasHeight;
+}
+
+// Clear the canvas
+function clearCanvas() {
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+}
+
+// Reset everything when try again is elected
+function resetGame() {
+  // Clear the victory message
+  hideVictoryMessage();
+
+  // Reset the game state
+  paddleX = (canvasWidth - paddleWidth) / 2;
+  ballX = canvasWidth / 2;
+  ballY = canvasHeight - 30;
+  ballSpeedX = 2;
+  ballSpeedY = -2;
+  currentLevel = 1;
+  score = 0;
+  lives = 4;
+  gamePaused = false;
+  gameLost = false;
+  hidePauseMessage();
+  hideGameOverMessage();
+  bricks = generateBricks();
+  drawBricks();
+}
+
+// Building Environment
+// Generate brick layouts based on current level
+function generateBricks() {
+  const levelLayouts = {
+    1: [
+      [1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1],
+      [1, 1, 1, 1, 1, 1]
+    ],
+    2: [
+      [1, 0, 1, 0, 1, 0],
+      [0, 1, 0, 1, 0, 1],
+      [1, 0, 1, 0, 1, 0],
+      [0, 1, 0, 1, 0, 1]
+    ],
+    // Can add more level layouts as array of arrays here
+  };
+
+  const layout = levelLayouts[currentLevel] || [];
+  brickRowCount = layout.length;
+  brickColumnCount = layout.length > 0 ? layout[0].length : 0;
+
+  brickOffsetLeft = (canvas.width - (brickColumnCount * brickWidth + (brickColumnCount - 1) * brickPadding)) / 2;
+
+  const generatedBricks = [];
+  for (let row = 0; row < brickRowCount; row++) {
+    generatedBricks[row] = [];
+    for (let col = 0; col < brickColumnCount; col++) {
+      const brickX = col * (brickWidth + brickPadding) + brickOffsetLeft;
+      const brickY = row * (brickHeight + brickPadding) + brickOffsetTop;
+      if (layout[row][col] === 1) {
+        generatedBricks[row][col] = {
+          x: brickX,
+          y: brickY,
+          color: getRandomColorForRow(row),
+        };
+      }
+    }
+  }
+  return generatedBricks;
+}
+
+// Defining behavior for when the ball hits a brick
+function brickHit(row, col) {
+  bricks[row][col] = null; // Remove the brick from the array when hit
+  score++; // Increase the score when brick is hit
+
+  if (score === brickRowCount * brickColumnCount) {
+    // Check for victory (if all bricks are gone)
+    handleVictory();
+  }
+}
+
+
+// Game End Behavior
+// Show the game over message
+function showGameOverMessage() {
+    gameOverMessage.style.display = "block";
+}
+  
+// Hide the game over message
+  function hideGameOverMessage() {
+    gameOverMessage.style.display = "none";
+}
+
+// Show the victory message
+function showVictoryMessage() {
+    const message = document.getElementById("victoryMessage");
+    message.style.display = "block";
+}
+
+// Hide the victory message
+function hideVictoryMessage() {
+    const victoryMessage = document.getElementById("victoryMessage");
+    victoryMessage.style.display = "none";
+}
+
+// Take player to highscores.html (on win)
+function navigateToHighScores() {
+    window.location.href = "highscores.html";
+}
+
+// Behavior for when player wins
+function handleVictory() {
+  gamePaused = true;
+  showVictoryMessage();
+  navigateToHighScores();
+}
+
+// Behavior for when player loses (out of lives)
+function checkGameOver() {
+    if (lives === 0) {
+      gameLost = true;
+      showGameOverMessage(); // Call the function to show the game over message
+    }
+  }
+
+// Check for victory condition
+function checkVictory() {
+    let bricksRemaining = 0;
+    for (let row = 0; row < brickRowCount; row++) {
+      for (let col = 0; col < brickColumnCount; col++) {
+        if (bricks[row][col]) {
+          bricksRemaining++;
+        }
+      }
+    }
+  
+    if (bricksRemaining === 0) {
+      showVictoryMessage();
+    }
+}
+
+// Update the game state and animations
+function update() {
+  if (gameLost) {
+    showGameOverMessage();
+    return;
+  }
+
+  if (gamePaused) {
+    showPauseMessage();
+    return;
+  }
+
+  moveBall();
+  checkGameOver();
+  checkVictory();
+  clearCanvas();
+  drawBricks();
+  drawPaddle();
+  drawBall();
+  drawScore();
+  drawLives();
+
+  requestAnimationFrame(update);
+}
+
+// Controls
+// Move the paddle to the left
+function movePaddleLeft() {
+    paddleX -= 10;
+    if (paddleX < 0) {
+      paddleX = 0;
+    }
+  }
+  
+  // Move the paddle to the right
+function movePaddleRight() {
+    paddleX += 10;
+    if (paddleX > canvasWidth - paddleWidth) {
+      paddleX = canvasWidth - paddleWidth;
+    }
+}
+
+// Handler function -- keyboard input -- (L&R Arrows, Space Bar, Escape)
+function handleKeyboardInput(event) {
+  if (event.key === "ArrowLeft") {
+    movePaddleLeft();
+  } else if (event.key === "ArrowRight") {
+    movePaddleRight();
+  } else if (event.key === "Escape") {
+    if (gamePaused) {
+      unpauseGame();
+    } else {
+      pauseGame();
+    }
+  } else if (event.key === " ") {
+    if (!gameStarted) {
+      launchBall();
+      gameStarted = true;
+    }
+  }
+}
+
+
+// Defining Ball Movement & Behavior
+function moveBall() {
+  ballX += ballSpeedX;
+  ballY += ballSpeedY;
+
+  // Handle ball collisions with the canvas wall
+  if (ballX + ballRadius > canvasWidth || ballX - ballRadius < 0) {
+    ballSpeedX *= -1;
+  }
+  if (ballY - ballRadius < 0) {
+    ballSpeedY *= -1;
+  }
+
+  // Handle ball collision with the paddle
+  if (
+    ballY + ballRadius > canvasHeight - paddleHeight &&
+    ballX > paddleX &&
+    ballX < paddleX + paddleWidth
+  ) {
+    ballSpeedY *= -1;
+  }
+
+  // Handle ball collision with bricks
+  for (let row = 0; row < brickRowCount; row++) {
+    for (let col = 0; col < brickColumnCount; col++) {
+      const brick = bricks[row][col];
+      if (brick) {
+        if (
+          ballX > brick.x &&
+          ballX < brick.x + brickWidth &&
+          ballY > brick.y &&
+          ballY < brick.y + brickHeight
+        ) {
+          ballSpeedY *= -1;
+          brickHit(row, col);
+        }
+      }
+    }
+  }
+
+  // Prevent ball from going out of bounds of the canvas
+  if (ballY + ballRadius > canvasHeight) {
+    loseLife();
+    resetPaddleAndBall();
+  }
+}
+
+// Draw the bricks on the canvas
+function drawBricks() {
+  for (let row = 0; row < brickRowCount; row++) {
+    for (let col = 0; col < brickColumnCount; col++) {
+      const brick = bricks[row][col];
+      if (brick) {
+        const brickX = brick.x;
+        const brickY = brick.y;
+        ctx.beginPath();
+        ctx.rect(brickX, brickY, brickWidth, brickHeight);
+        ctx.fillStyle = brick.color;
+        ctx.fill();
+        ctx.closePath();
+      }
+    }
+  }
+}
+
+// Draw the paddle on the canvas
+function drawPaddle() {
+  ctx.beginPath();
+  ctx.rect(paddleX, canvasHeight - paddleHeight, paddleWidth, paddleHeight);
+  ctx.fillStyle = "#0095DD";
+  ctx.fill();
+  ctx.closePath();
+}
+
+// Draw the ball on the canvas
+function drawBall() {
+  ctx.beginPath();
+  ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+  ctx.fillStyle = "#0095DD";
+  ctx.fill();
+  ctx.closePath();
+}
+
+// Show the score on the canvas
+function drawScore() {
+  ctx.font = "16px Arial";
+  ctx.fillStyle = "#0095DD";
+  ctx.fillText("Score: " + score, 8, 20);
+}
+
+// Lose a life
+function loseLife() {
+    lives--;
+}
+
+// Show the remaining lives on the canvas
+function drawLives() {
+  ctx.font = "16px Arial";
+  ctx.fillStyle = "#0095DD";
+  ctx.fillText("Lives: " + lives, canvasWidth - 65, 20);
+}
+
+
+// Game Pause Behavior
+// Show the pause message
+function showPauseMessage() {
+  pauseMessage.style.display = "block";
+}
+
+// Hide the pause message
+function hidePauseMessage() {
+  pauseMessage.style.display = "none";
+}
+
+// Pause the game
+function pauseGame() {
+  gamePaused = true;
+}
+
+// Unpause the game
+function unpauseGame() {
+  gamePaused = false;
+  hidePauseMessage();
+}
+
+
+
+// Reset the paddle and ball positions
+function resetPaddleAndBall() {
+  paddleX = (canvasWidth - paddleWidth) / 2;
+  ballX = canvasWidth / 2;
+  ballY = canvasHeight - 30;
+}
+
+// Launch the ball
+function launchBall() {
+  // Code to launch the ball
+  ballSpeedY = -ballSpeedY;
+}
+
+// Reset the game and start from level 1
+function resetAndStartGame() {
+  resetGame();
+  startGame();
+}
+
+// Generate a random color for each row of bricks
+function getRandomColorForRow(row) {
+  const colors = ["red", "orange", "yellow", "green", "blue", "purple"];
+  return colors[row % colors.length];
+}
+
+// Start the game
+function startGame() {
+  init();
+}
+
+// Call the startGame function to begin the game
+startGame();
