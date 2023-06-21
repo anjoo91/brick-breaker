@@ -12,19 +12,25 @@
         <canvas id="gameCanvas"></canvas>
     </section>
 
-    <div id="pauseMessage">
-        <p>Game Paused</p>
+    <div id="pauseMessage" class="message">
+        <h2>Game Paused</h2>
+        <button id="resumeBtn" class="game-button">Resume</button>
     </div>
 
-    <div id="victoryMessage" class="message">
-        <h2>You Win!</h2>
-    </div>      
-    
-    <div id="gameOverMessage" style="display: none;">
+    <div id="gameOverMessage" class="message">
         <h2>Game Over</h2>
-        <button id="tryAgainBtn">Try Again?</button>
-        <button id="quitBtn">Quit</button>
+        <div class="buttons-container">
+          <button id="tryAgainBtn" class="game-button">Try Again</button>
+          <button id="quitBtn" class="game-button">Quit</button>
+        </div>
     </div>
+      <div id="victoryMessage" class="message">
+        <h2>You Win!</h2>
+        <p>Congratulations!</p>
+        <button id="highScoresBtn" class="game-button">View High Scores</button>
+      </div>
+    </div>
+      
       
     <script src="js/app.js"></script>
 
