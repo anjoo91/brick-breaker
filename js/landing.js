@@ -3,22 +3,23 @@ const audio = document.getElementById("backgroundAudio");
 const playPauseButton = document.getElementById("playPauseButton");
 const volumeSlider = document.getElementById("volumeSlider");
 
-// Function to start the game
+// Start the game
 function startGame() {
     // Redirect to the game page
     window.location.href = "game.html";
 }
 
-// Function to view high scores
+// View high scores
 function viewScores() {
-    // Redirect to the scores page
+    // Redirect to the high scores page
     window.location.href = "highscores.html";
 }
 
-//Function to Play/Pause music
+// Play/Pause music
 function togglePlayPause() {
     if (audio.paused) {
         audio.play();
+        audio.volume = 0.25;
         playPauseButton.textContent = "Pause BGM";
     } else {
         audio.pause();
@@ -26,7 +27,7 @@ function togglePlayPause() {
     }
 }
 
-//Function to adjust volume of music
+// Adjust volume of music
 function adjustVolume() {
     audio.volume = volumeSlider.value;
 }
