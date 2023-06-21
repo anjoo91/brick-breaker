@@ -38,6 +38,11 @@ const quitBtn = document.getElementById("quitBtn");
 document.addEventListener("keydown", handleKeyboardInput);
 tryAgainBtn.addEventListener("click", resetAndStartGame);
 quitBtn.addEventListener("click", navigateToHighScores);
+resumeBtn.addEventListener("click", () => {
+  const event = new KeyboardEvent("keydown", { key: "Escape" });
+  document.dispatchEvent(event);
+});
+
 
 /*----- Functions -----*/
 
