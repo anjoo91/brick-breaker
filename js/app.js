@@ -51,6 +51,8 @@ function init() {
   setCanvasDimensions();
   resetGame();
   update();
+
+  //setInterval(update, 100); //this makes ball run super fast...
 }
 
 // Set the canvas dimensions
@@ -334,7 +336,14 @@ function update() {
   drawLives();
 
   requestAnimationFrame(update);
-  console.log(drawBricks);
+  // console.log(moveBall);
+  // console.log(checkGameOver);
+  // console.log(checkVictory);
+  // console.log(clearCanvas);
+  // console.log(drawBricks);
+  // console.log(drawBricks);
+  // console.log(drawScore);
+  // console.log(drawLives);
 }
 
 
