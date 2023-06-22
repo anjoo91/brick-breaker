@@ -1,5 +1,5 @@
 body {
-    background-image: url('/assets/images/space-background.gif');
+    background-image: url('assets/images/space-background.gif');
     background-repeat: no-repeat;
     background-size: cover;
     display: flex;
