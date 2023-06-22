@@ -27,7 +27,7 @@ let gameLost = false;
 let gameStarted = false; // Track if the game has started
 let cheatKeyPressed = false; // Track cheat key press
 let highScoreSaved = false; // Track if the high score has already been saved
-
+let animation_id;
 
 /*----- Cached Elements -----*/
 const canvas = document.getElementById("gameCanvas");
@@ -61,6 +61,7 @@ document.getElementById("highScoresBtn").addEventListener("click", navigateToHig
 function init() {
   setCanvasDimensions();
   resetGame();
+  cancelAnimationFrame(animation_id);
   update();
 
   //setInterval(update, 100); //this makes ball run super fast...
@@ -111,10 +112,11 @@ function checkVictory() {
       }
     }
   }
-  console.log(bricksRemaining);
+  //console.log(bricksRemaining); // tells us how many bricks we have left
   if (bricksRemaining === 0) {
     showVictoryMessage();
-    handleVictory();
+    handleVictory(); // Win!
+    cancelAnimationFrame(animation_id);
   }
 }
 
@@ -129,23 +131,23 @@ function handleVictory() {
 
 // Check if there are any high scores in local storage
 function getHighScores() {
-  const highScores = localStorage.getItem("highScores"); // Convert stored scores into array
+  const highScores = localStorage.getItem("highScores"); // Get values associated with "highScores" key
   return highScores ? JSON.parse(highScores) : []; // If there are no high scores, return an empty array
 }
 
 // Convert array to json string
 function saveHighScores(scores) {
-  localStorage.setItem("highScores", JSON.stringify(scores));
+  localStorage.setItem("highScores", JSON.stringify(scores)); // This is needed bc .setItem() only takes strings & stores it in local storage
 }
 
 //Save high score to local storage
 function saveHighScore() {
-  const playerName = prompt("Congratulations! Enter your name:");
-  if (playerName) {
+  const playerName = prompt("Congratulations! Enter your name:"); // Store player name
+  if (playerName) { // The player can click cancel
     const highScores = getHighScores();
-    const lowestScore = highScores.length > 0 ? highScores[highScores.length - 1].score : 0;
+    const lowestScore = highScores.length > 0 ? highScores[highScores.length - 1].score : 0; // Values of highScores are sorted, so last one is the lowest value
     if (score > lowestScore) {
-      highScores.push({ playerName, score });
+      highScores.push({ playerName, score }); // Add player name and score
       highScores.sort((a, b) => b.score - a.score); // Sort high scores in descending order
       highScores.splice(10); // Keep only the top 10 high scores
       saveHighScores(highScores);
@@ -186,6 +188,7 @@ function hideGameOverMessage() {
 function checkGameOver() {
   if (lives === 0) {
     gameLost = true;
+    cancelAnimationFrame(animation_id);
     showGameOverMessage(); // Call the function to show the game over message
   }
 }
@@ -205,13 +208,14 @@ function hideContinueButton() {
 // Continue the game with the next level
 function continueGame() {
   //console.log("Continue Game Clicked");
-  clearCanvas();
+  clearCanvas(); // Clear canvas prior to resetting everything
+  cancelAnimationFrame(animation_id);
   currentLevel+=1; // Increase the level
   const previousScore = score; // Store the previous score
   resetGame(); // Reset the game for the next level
   score = previousScore; // Restore the previous score
   hideContinueButton(); // Hide the "Continue Game" button
-  update();
+  update(); // Run game
 }
 
 // Creating Assets
@@ -291,6 +295,7 @@ function brickHit(row, col) {
 
   if (score === brickRowCount * brickColumnCount) {
     // Check for victory
+    console.log("handleVic");
     handleVictory();
   }
 }
@@ -403,7 +408,10 @@ function resetPaddleAndBall() {
 function update() {
   if (gameLost) {
     showGameOverMessage();
+    cancelAnimationFrame(animation_id);
+    console.log("Lost");
     return;
+    
   }
 
   //need to define behavior specific to gamePaused
@@ -419,9 +427,9 @@ function update() {
   drawBall();
   drawScore();
   drawLives();
-
+  console.log(animation_id, "animation_id"); 
   if (!gamePaused) {
-    requestAnimationFrame(update);
+    animation_id = requestAnimationFrame(update);
   }
 }
 
@@ -487,6 +495,7 @@ function hidePauseMessage() {
 function pauseGame() {
   if (!gamePaused) {
     gamePaused = true;
+    cancelAnimationFrame(animation_id);
     showPauseMessage(); // Show the game paused message
     showResumeButton(); // Show the resume button
   }
@@ -496,6 +505,7 @@ function pauseGame() {
 function unpauseGame() {
   gamePaused = false;
   hidePauseMessage();
+  cancelAnimationFrame(animation_id);
   update();
 }
 
@@ -504,25 +514,25 @@ function showResumeButton() {
   resumeBtn.style.display = "block";
 }
 
-// Launch the ball -- WIP*
-function launchBall() {
-  const ballSpeed = 2; // Adjust the speed as needed
+// // Launch the ball -- WIP*
+// function launchBall() {
+//   const ballSpeed = 2; // Adjust the speed as needed
 
-  if (!gameStarted) {
-    // Launch the ball at the start of the game
-    gameStarted = true;
-    ballSpeedX = ballSpeed;
-    ballSpeedY = -ballSpeed;
-  } else if (gamePaused) {
-    // Unpause the game and continue the ball movement
-    gamePaused = false;
-  } else {
-    // Launch the ball after losing a life or resetting
-    resetPaddleAndBall();
-    ballSpeedX = ballSpeed;
-    ballSpeedY = -ballSpeed;
-  }
-}
+//   if (!gameStarted) {
+//     // Launch the ball at the start of the game
+//     gameStarted = true;
+//     ballSpeedX = ballSpeed;
+//     ballSpeedY = -ballSpeed;
+//   } else if (gamePaused) {
+//     // Unpause the game and continue the ball movement
+//     gamePaused = false;
+//   } else {
+//     // Launch the ball after losing a life or resetting
+//     resetPaddleAndBall();
+//     ballSpeedX = ballSpeed;
+//     ballSpeedY = -ballSpeed;
+//   }
+// }
 
 // Lose a life
 function loseLife() {
