@@ -39,18 +39,17 @@ About This Game:
     A classic brick-breaking game built with HTML, CSS, & Javascript. HTML Canvas is used.
 
     Your goal is to break all the bricks, using the paddle to return the ball towards the bricks each time. 
-    Rounds initiate when you press spacebar. You may choose to launch the ball at any spot of your choice.
     Clearing all bricks will result in a victory, while missing the ball will result in a loss of a life.
     When all lives have been exhausted, the game will end - you lost. 
     
     You may restart the round when the restart button appears.
     Pressing Escape at any time will pause the game.
+    You may progress to the next round. 
 
 
 Features: 
 
     + Paddle control via left & right arrow keys
-    + Ball launch via spacebar
     + Current score display
     + 'Game Over' or 'You Win!' message when all bricks are cleared or when there are no more lives
     + Pause game via Escape key

@@ -21,10 +21,13 @@ let brickRowCount;
 let brickColumnCount;
 let score;
 let lives;
-let currentLevel;
+let currentLevel = 1;
 let gamePaused = false;
 let gameLost = false;
 let gameStarted = false; // Track if the game has started
+let cheatKeyPressed = false; // Track cheat key press
+let highScoreSaved = false; // Track if the high score has already been saved
+
 
 /*----- Cached Elements -----*/
 const canvas = document.getElementById("gameCanvas");
@@ -35,13 +38,21 @@ const tryAgainBtn = document.getElementById("tryAgainBtn");
 const quitBtn = document.getElementById("quitBtn");
 
 /*----- Event Listeners -----*/
+// Keyboard Controls
 document.addEventListener("keydown", handleKeyboardInput);
+// "Try Again" button (on loss)
 tryAgainBtn.addEventListener("click", resetAndStartGame);
+// "Quit" button (on loss)
 quitBtn.addEventListener("click", navigateToHighScores);
+// "Resume Game" button (on pause)
 resumeBtn.addEventListener("click", () => {
   const event = new KeyboardEvent("keydown", { key: "Escape" });
   document.dispatchEvent(event);
 });
+// "Continue Game" button (on win)
+document.getElementById("continueBtn").addEventListener("click", continueGame);
+// "View High Scores" button (on win)
+document.getElementById("highScoresBtn").addEventListener("click", navigateToHighScores);
 
 
 /*----- Functions -----*/
@@ -70,6 +81,7 @@ function clearCanvas() {
 function resetGame() {
   // Clear the victory message
   hideVictoryMessage();
+  hideContinueButton();
 
   // Reset the game state
   paddleX = (canvasWidth - paddleWidth) / 2;
@@ -77,7 +89,7 @@ function resetGame() {
   ballY = canvasHeight - 30;
   ballSpeedX = 2;
   ballSpeedY = -2;
-  currentLevel = 1;
+  //currentLevel = 1;
   score = 0;
   lives = 4;
   gamePaused = false;
@@ -99,20 +111,50 @@ function checkVictory() {
       }
     }
   }
-
+  console.log(bricksRemaining);
   if (bricksRemaining === 0) {
     showVictoryMessage();
+    handleVictory();
   }
 }
 
 // Define behavior victory is achieved
 function handleVictory() {
   gamePaused = true;
+  hidePauseMessage(); // Hide the game paused message
   showVictoryMessage();
-  navigateToHighScores();
+  saveHighScore(); // Save the player's score
+  showContinueButton(); // Show the "Continue Game" button
 }
 
-// Upon victory, take player to highscores.html
+// Check if there are any high scores in local storage
+function getHighScores() {
+  const highScores = localStorage.getItem("highScores"); // Convert stored scores into array
+  return highScores ? JSON.parse(highScores) : []; // If there are no high scores, return an empty array
+}
+
+// Convert array to json string
+function saveHighScores(scores) {
+  localStorage.setItem("highScores", JSON.stringify(scores));
+}
+
+//Save high score to local storage
+function saveHighScore() {
+  const playerName = prompt("Congratulations! Enter your name:");
+  if (playerName) {
+    const highScores = getHighScores();
+    const lowestScore = highScores.length > 0 ? highScores[highScores.length - 1].score : 0;
+    if (score > lowestScore) {
+      highScores.push({ playerName, score });
+      highScores.sort((a, b) => b.score - a.score); // Sort high scores in descending order
+      highScores.splice(10); // Keep only the top 10 high scores
+      saveHighScores(highScores);
+    }
+  }
+}
+
+
+// Take player to highscores.html
 function navigateToHighScores() {
   window.location.href = "highscores.html";
 }
@@ -148,6 +190,30 @@ function checkGameOver() {
   }
 }
 
+// Show the "Continue Game" button
+function showContinueButton() {
+  const continueBtn = document.getElementById("continueBtn");
+  continueBtn.style.display = "block";
+}
+
+// Hide the "Continue Game" button
+function hideContinueButton() {
+  const continueBtn = document.getElementById("continueBtn");
+  continueBtn.style.display = "none";
+}
+
+// Continue the game with the next level
+function continueGame() {
+  //console.log("Continue Game Clicked");
+  clearCanvas();
+  currentLevel+=1; // Increase the level
+  const previousScore = score; // Store the previous score
+  resetGame(); // Reset the game for the next level
+  score = previousScore; // Restore the previous score
+  hideContinueButton(); // Hide the "Continue Game" button
+  update();
+}
+
 // Creating Assets
 // Generate a random color for each row of bricks
 function getRandomColorForRow(row) {
@@ -170,29 +236,50 @@ function generateBricks() {
       [1, 0, 1, 0, 1, 0],
       [0, 1, 0, 1, 0, 1]
     ],
+    3: [
+      [1, 1, 1, 1, 1, 1, 1],
+      [0, 1, 0, 1, 0, 1, 0],
+      [1, 1, 1, 1, 1, 1, 1],
+      [0, 1, 0, 1, 0, 1, 0],
+      [1, 1, 1, 1, 1, 1, 1]
+    ],
+    4: [
+      [0, 1, 0, 0, 0, 1, 0],
+      [0, 0, 0, 0, 0, 0, 0],
+      [1, 0, 1, 0, 1, 0, 1],
+      [0, 0, 0, 0, 0, 0, 0],
+      [1, 0, 0, 1, 0, 0, 1],
+      [0, 0, 0, 0, 0, 0, 0],
+      [0, 1, 0, 0, 0, 1, 0],
+      [0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 1, 0, 1, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 1, 0, 0, 0]
+    ],
     // Add more level layouts here
   };
 
   const layout = levelLayouts[currentLevel] || [];
-  brickRowCount = layout.length;
+  brickRowCount = 0;
   brickColumnCount = layout.length > 0 ? layout[0].length : 0;
 
   brickOffsetLeft = (canvas.width - (brickColumnCount * brickWidth + (brickColumnCount - 1) * brickPadding)) / 2;
 
   const generatedBricks = [];
-  for (let row = 0; row < brickRowCount; row++) {
+  for (let row = 0; row < layout.length; row++) {
     generatedBricks[row] = [];
     for (let col = 0; col < brickColumnCount; col++) {
       const brickX = col * (brickWidth + brickPadding) + brickOffsetLeft;
-      const brickY = row * (brickHeight + brickPadding) + brickOffsetTop;
+      const brickY = brickRowCount * (brickHeight + brickPadding) + brickOffsetTop;
       if (layout[row][col] === 1) {
-        generatedBricks[row][col] = {
+        generatedBricks[brickRowCount].push({
           x: brickX,
           y: brickY,
-          color: getRandomColorForRow(row),
-        };
+          color: getRandomColorForRow(brickRowCount),
+        });
       }
     }
+    brickRowCount++;
   }
   return generatedBricks;
 }
@@ -274,8 +361,8 @@ function moveBall() {
   // Ball collisions with the paddle
   if (
     ballY + ballRadius > canvasHeight - paddleHeight &&
-    ballX > paddleX &&
-    ballX < paddleX + paddleWidth
+    ballX + ballRadius > paddleX &&
+    ballX - ballRadius < paddleX + paddleWidth
   ) {
     ballSpeedY *= -1;
   }
@@ -286,10 +373,10 @@ function moveBall() {
       const brick = bricks[row][col];
       if (brick) {
         if (
-          ballX > brick.x &&
-          ballX < brick.x + brickWidth &&
-          ballY > brick.y &&
-          ballY < brick.y + brickHeight
+          ballX + ballRadius > brick.x &&
+          ballX - ballRadius < brick.x + brickWidth &&
+          ballY + ballRadius > brick.y &&
+          ballY - ballRadius < brick.y + brickHeight
         ) {
           ballSpeedY *= -1;
           brickHit(row, col);
@@ -319,14 +406,12 @@ function update() {
     return;
   }
 
-  if (gamePaused) {
-    showPauseMessage();
-    return;
+  //need to define behavior specific to gamePaused
+  if (!gamePaused) {
+    moveBall();
+    checkGameOver();
+    checkVictory();
   }
-
-  moveBall();
-  checkGameOver();
-  checkVictory();
 
   clearCanvas();
   drawBricks();
@@ -335,19 +420,12 @@ function update() {
   drawScore();
   drawLives();
 
-  requestAnimationFrame(update);
-  // console.log(moveBall);
-  // console.log(checkGameOver);
-  // console.log(checkVictory);
-  // console.log(clearCanvas);
-  // console.log(drawBricks);
-  // console.log(drawBricks);
-  // console.log(drawScore);
-  // console.log(drawLives);
+  if (!gamePaused) {
+    requestAnimationFrame(update);
+  }
 }
 
-
-// Controls
+//Controls
 // Handle keyboard input
 function handleKeyboardInput(event) {
   if (event.key === "ArrowLeft") {
@@ -366,6 +444,12 @@ function handleKeyboardInput(event) {
       gameStarted = true;
     } else if (gamePaused) {
       unpauseGame(); // Resume the game
+    }
+  } else if (event.key === "\\") {
+    if (cheatKeyPressed) {
+      forceVictory();
+    } else {
+      cheatKeyPressed = true;
     }
   }
 }
@@ -388,7 +472,7 @@ function movePaddleRight() {
 }
 
 
-// Pause Functionality -- WIP*
+// Pause Functionality
 // Show the pause message
 function showPauseMessage() {
   pauseMessage.style.display = "block";
@@ -401,7 +485,11 @@ function hidePauseMessage() {
 
 // Pause the game
 function pauseGame() {
-  gamePaused = true;
+  if (!gamePaused) {
+    gamePaused = true;
+    showPauseMessage(); // Show the game paused message
+    showResumeButton(); // Show the resume button
+  }
 }
 
 // Unpause the game
@@ -409,6 +497,11 @@ function unpauseGame() {
   gamePaused = false;
   hidePauseMessage();
   update();
+}
+
+// Show the resume button
+function showResumeButton() {
+  resumeBtn.style.display = "block";
 }
 
 // Launch the ball -- WIP*
@@ -435,6 +528,13 @@ function launchBall() {
 function loseLife() {
   lives--;
 }
+
+// Force victory with maximum scores -- for debugging
+function forceVictory() {
+  score = brickRowCount * brickColumnCount;
+  handleVictory();
+}
+
 
 // Reset the game and start from level 1
 function resetAndStartGame() {

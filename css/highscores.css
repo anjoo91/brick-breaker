@@ -1,0 +1,45 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: black;
+    color: white;
+    display: grid;
+    place-items: center;
+    height: 100vh;
+  }
+  
+  h1 {
+    margin-top: 20px;
+    color: white;
+  }
+  
+#scoresTableBody {
+    border-collapse: collapse;
+    width: 50%;
+    gap: 10px; /* Increase the gap between cells */
+}
+  
+#scoresTableBody th,
+#scoresTableBody td {
+    padding: 10px;
+}
+  
+#scoresTableBody th {
+    background-color: #333;
+    color: #fff;
+}
+  
+#scoresTableBody tr:nth-child(even),
+#scoresTableBody tr:nth-child(odd) {
+    background-color: black;
+}
+  
+#scoresTableBody tr:hover {
+    background-color: #555;
+}
+  
+#returnBtn {
+    display: block;
+    margin: 20px auto;
+}
+  
