@@ -227,6 +227,8 @@ function getRandomColorForRow(row) {
 
 // Generate bricks in specific layouts
 function generateBricks() {
+  // Level layout object defines all the different configurations possible.
+  // In each 2D array, 1 represents a brick and 0 represents an empty space. 
   const levelLayouts = {
     1: [
       [1, 1, 1, 1, 1, 1],
@@ -263,18 +265,50 @@ function generateBricks() {
     // Add more level layouts here
   };
 
-  const layout = levelLayouts[currentLevel] || [];
-  brickRowCount = 0;
-  brickColumnCount = layout.length > 0 ? layout[0].length : 0;
+  // We have a finite # of configurations! We need to prevent an error when we are at a higher level than possible layouts.
+  // Check that the current level exists, otherwise we get an empty array (no bricks)
+  // Store the layout of the currentLevel in a variable (layout)
+  const layout = levelLayouts[currentLevel] || []; 
 
+  // Now we have to figure out where on the canvas to put the bricks
+  // Initialize 2 variables that will store the dimensions of the 2D array
+  // brickRowCount stores the # of rows in the 2D array: layout.length
+  // brickColumnCount stores the # of columns in the 2D array: layout[0].length
+  // In both cases, the default value will be 0. This is mostly for error handling.
+  brickRowCount = layout.length > 0 ? layout.length : 0;
+  brickColumnCount = layout.length > 0 ? layout[0].length : 0;
+  
+  // Next, we always want to center the bricks no matter the layout
+  // We can do this by defining the offset of the first column of bricks from
+  // the left boundary of the canvas. This has to be dynamically calculated 
+  // in case we have additional columns of bricks added.
+  // brickColumnCount * brickWidth = total space consumed by the columns
+  // (brickColumnCount - 1) * brickPadidng = total additional space used up by brickPadding
   brickOffsetLeft = (canvas.width - (brickColumnCount * brickWidth + (brickColumnCount - 1) * brickPadding)) / 2;
 
+  // Now we are ready to determine the exact properties for each brick
+  // like the x/y coordinates and color. We'll store these properties as 
+  // an object. The entire layout will be stored as an array, of these objects.
+  // We initialize an empty generatedBricks array, which will be returned later.
   const generatedBricks = [];
+
+  // First we iterate over the rows of the layout array to determine how many 
+  // arrays we'll need to store in generatedBricks, where we'll be storing the properties
+  // of each row of bricks.
   for (let row = 0; row < layout.length; row++) {
     generatedBricks[row] = [];
+    // We iterate over columns of the layout array to calculate
+    // the X & Y coordinates of the brick.
     for (let col = 0; col < brickColumnCount; col++) {
+      // Finding X coordinate
       const brickX = col * (brickWidth + brickPadding) + brickOffsetLeft;
+      // Finding Y coordinate
       const brickY = brickRowCount * (brickHeight + brickPadding) + brickOffsetTop;
+
+      // Finally, we need to check if at a specific index, the value of the element in
+      // the layout array is a 1 (brick) or 0 (empty space). If the element is equal to 1, 
+      // we store the X & Y coordinates by using the array .push method. Then we call a simple
+      // random color generator function to assign a specific color to the entire row.
       if (layout[row][col] === 1) {
         generatedBricks[brickRowCount].push({
           x: brickX,
@@ -283,40 +317,38 @@ function generateBricks() {
         });
       }
     }
+    // Increment the brickRowCount to make sure we move onto the next row in the array.
     brickRowCount++;
   }
   return generatedBricks;
 }
 
-// Define collision behavior when ball hits brick
-function brickHit(row, col) {
-  bricks[row][col] = null; // Remove brick from array
-  score++; // Increase score
-
-  if (score === brickRowCount * brickColumnCount) {
-    // Check for victory
-    console.log("handleVic");
-    handleVictory();
-  }
-}
-
 // Draw bricks on canvas
 function drawBricks() {
+  // We're going to iterate over each object in the array from generateBricks
   for (let row = 0; row < brickRowCount; row++) {
     for (let col = 0; col < brickColumnCount; col++) {
+      // For each object in the array generateBricks; bricks = generateBricks(); elsewhere in the code
       const brick = bricks[row][col];
+      // we want to extract the X & Y coordinates
       if (brick) {
         const brickX = brick.x;
         const brickY = brick.y;
+        // Start drawing
         ctx.beginPath();
+        // We draw a rectangular brick at the specific X & Y coordinates
+        // with the specific brickWidth & brickHeight.
         ctx.rect(brickX, brickY, brickWidth, brickHeight);
+        // Then we fill the rectangle with the color designated.
         ctx.fillStyle = brick.color;
         ctx.fill();
+        // Stop drawing
         ctx.closePath();
       }
     }
   }
 }
+
 
 // Draw paddle on canvas
 function drawPaddle() {
@@ -394,6 +426,18 @@ function moveBall() {
   if (ballY + ballRadius > canvasHeight) {
     loseLife();
     resetPaddleAndBall();
+  }
+}
+
+// Remove brick from array when ball hits brick
+function brickHit(row, col) {
+  bricks[row][col] = null; // Remove brick from array
+  score++; // Increase score
+
+  if (score === brickRowCount * brickColumnCount) {
+    // Check for victory
+    console.log("handleVic");
+    handleVictory();
   }
 }
 
