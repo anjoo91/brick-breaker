@@ -40,7 +40,7 @@ function renderHighScores() {
   
 // Return to main menu
 function returnToMainMenu() {
-    window.location.href = "https://github.com/anjoo91/brick-breaker";
+    window.location.href = "https://anjoo91.github.io/brick-bre";
 }
   
 // Return button
