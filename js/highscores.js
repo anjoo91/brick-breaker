@@ -40,7 +40,7 @@ function renderHighScores() {
   
 // Return to main menu
 function returnToMainMenu() {
-    window.location.href = "landing.html";
+    window.location.href = "/index.html";
 }
   
 // Return button
