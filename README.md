@@ -14,10 +14,10 @@
     _/_/_/        _/            _/_/_/      _/_/_/      _/    _/     _/_/_/     _/            
 
 
-By: anjoo91
-GitHub Repo: https://github.com/anjoo91/brick-breaker
-GitHub Deployment Page: https://anjoo91.github.io/brick-breaker/
-Game Version: 0.1a
+- By: anjoo91
+- GitHub Repo: https://github.com/anjoo91/brick-breaker
+- GitHub Deployment Page: https://anjoo91.github.io/brick-breaker/
+- Game Version: 0.1a
 
 
 **File Structure:**
