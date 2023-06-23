@@ -33,7 +33,8 @@ Game Version: 0.1a
     │   └── app.js
     └── README.md
 
-**Brick Breaker: Clone of Arkanoid**
+# Brick Breaker: Clone of Arkanoid
+
 
 **About This Game:**
 
@@ -65,10 +66,10 @@ Player Scores:
 
 
 **Technologies Used:**
-    - HTML & HTML Canvas
-    - CSS
-    - Javascript
-    - GitHub
+* HTML & HTML Canvas
+* CSS
+* Javascript
+* GitHub
 
 
 **Getting Started:**
@@ -98,10 +99,10 @@ Player Scores:
         You may pause the game at any point by pressing ESC on your keyboard. Resume the game at any poitn by pressing ESC again, or clicking on the resume button.
 
 **Next Steps:**    
-    - Sound effects for ball bounce, brick break, and other in-game events
-    - More levels & brick configurations
-    - Utilize database instead of local storage
-    - Add occasional powerups
-    - Add difficulty settings that will affect ball speed and powerup frequency
+* Sound effects for ball bounce, brick break, and other in-game events
+* More levels & brick configurations
+* Utilize database instead of local storage
+* Add occasional powerups
+* Add difficulty settings that will affect ball speed and powerup frequency
 
 
