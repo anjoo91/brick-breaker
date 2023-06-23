@@ -272,10 +272,10 @@ function generateBricks() {
 
   // Now we have to figure out where on the canvas to put the bricks
   // Initialize 2 variables that will store the dimensions of the 2D array
-  // brickRowCount stores the # of rows in the 2D array: layout.length
+  // brickRowCount stores the # of rows in the 2D array, but we start at row index 0 since we will increment this later.
   // brickColumnCount stores the # of columns in the 2D array: layout[0].length
   // In both cases, the default value will be 0. This is mostly for error handling.
-  brickRowCount = layout.length > 0 ? layout.length : 0;
+  brickRowCount = 0;
   brickColumnCount = layout.length > 0 ? layout[0].length : 0;
   
   // Next, we always want to center the bricks no matter the layout
